@@ -1,12 +1,37 @@
-# Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+# ANDROID / ECLIPSE
+ 
+# built application files
+*.apk
+*.ap_
 
-## Build generated
-build/
-DerivedData/
-
-## Various settings
+# nodejs files
+node_modules/
+ 
+# files for the dex VM
+*.dex
+ 
+# Java class files
+*.class
+*.classpath
+*.settings
+*.project
+ 
+# generated files - android project subfolder
+Android/bin/
+Android/gen/
+Android/assets/
+.bin/*
+ 
+# generated files
+#bin/
+gen/
+ 
+# Local configuration file (sdk path, etc)
+local.properties
+ 
+# IOS / Xcode
+build/*
+Build/*
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -15,46 +40,48 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata/
-
-## Other
+# *.xcworkspace
+!default.xcworkspace
+xcuserdata
+profile
 *.moved-aside
+IOS/www/
+
+DerivedData/
+ 
+Pods/
 *.xcuserstate
+*.mode1v3
+*.mode2v3
+*.pbxuser
+*.perspectivev3
+*.xcuserdatad
+*.LSOverride
+*.xcconfig
+*.lock
 
-## Obj-C/Swift specific
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
+# OSX
+.DS_Store
+ 
+# Thumbnails
+._*
+ 
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
 
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
+#webstrom
+www/.idea/*
+.idea/*
 
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
+# bower files
+www/bower_components/*
 
-Carthage/Build
-
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the 
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md
-
-fastlane/report.xml
-fastlane/screenshots
-
-#Code Injection
-#
-# After new code Injection tools there's a generated folder /iOSInjectionProject
-# https://github.com/johnno1962/injectionforxcode
-
-iOSInjectionProject/
+# gradle files
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
