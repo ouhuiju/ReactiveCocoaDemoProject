@@ -44,13 +44,19 @@
     }];
     
 
+    
     [self initUI];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"]) {
+        NSNumber *isLoginNum = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"];
+        NSLog(@"%@",isLoginNum);
         _shouldPopupLoginView = ![(NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"] boolValue];
+    } else {
+        _shouldPopupLoginView = YES;
     }
     
     [RACObserve(self, shouldPopupLoginView) subscribeNext:^(id x) {
@@ -59,8 +65,8 @@
             
             LoginViewController *loginViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"loginViewController"];
             [self.navigationController presentViewController:loginViewController animated:YES completion:^{
-                _shouldPopupLoginView = NO;
             }];
+            _shouldPopupLoginView = NO;
         }
     }];
 }

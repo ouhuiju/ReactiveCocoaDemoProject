@@ -54,8 +54,8 @@
                 @strongify(self)
                 if ([success boolValue]) {
                     [self dismissViewControllerAnimated:YES completion:^{
-                        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"isLogin"];
                     }];
+                    [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"isLogin"];
                 } else {
                     [self errorAlert];
                     self.userNameTextField.text = @"";
