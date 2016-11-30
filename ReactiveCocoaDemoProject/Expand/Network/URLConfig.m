@@ -20,7 +20,8 @@
 }
 
 - (NSString *)host {
-    return @"http://ouok-w7.corp.oocl.com:8888";
+//    return @"http://ouok-w7.corp.oocl.com:8888";
+    return @"http://146.222.94.140:8888";
 }
 
 - (NSString *)login {

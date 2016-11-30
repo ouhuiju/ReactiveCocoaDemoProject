@@ -8,15 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import <ReactiveCocoa/ReactiveCocoa.h>
-#import <AFNetworking.h>
 #import <Mantle.h>
+#import <AFNetworking.h>
 
 @interface HomeTableViewModel : NSObject
 
-@property (nonatomic, strong) NSMutableArray *listData;
-
 @property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
+
+@property (nonatomic, strong) NSArray *listData;
+
 @property (nonatomic, strong) RACSignal *requestSignal;
+@property (nonatomic, strong) RACSignal *removeListDataSignal;
 @property (nonatomic, strong) RACCommand *editCommand;
 @property (nonatomic, strong) NSData *imageData;
 

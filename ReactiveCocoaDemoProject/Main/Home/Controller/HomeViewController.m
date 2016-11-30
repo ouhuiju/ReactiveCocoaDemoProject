@@ -20,34 +20,24 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    
-    self.title = @"Home";
-    
+        
     _homeViewModel = [[HomeTableViewModel alloc] init];
-//    self.tableView.delegate = self.homeViewModel;
-//    self.tableView.dataSource = self.homeViewModel;
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    
-    [[self rac_signalForSelector:@selector(tableView:numberOfRowsInSection:) fromProtocol:@protocol(UITableViewDataSource)] subscribeNext:^(id x) {
-    }];
-    
-    [[self rac_signalForSelector:@selector(numberOfSectionsInTableView:) fromProtocol:@protocol(UITableViewDataSource)] subscribeNext:^(id x) {
-        
-    }];
-    
-    [[self rac_signalForSelector:@selector(tableView:didSelectRowAtIndexPath:) fromProtocol:@protocol(UITableViewDelegate)] subscribeNext:^(id x) {
-    
-    }];
-
     
     [self loadDataWithSignal:_homeViewModel.requestSignal withSuccess:^{
         [self.tableView reloadData];
     } fail:^{
         NSLog(@"load list data error.");
     } complete:^{}];
+    
+    @weakify(self);
+    [RACObserve(self.homeViewModel, listData) subscribeNext:^(id x) {
+        @strongify(self)
+        NSLog(@"%ld", (unsigned long)self.homeViewModel.listData.count);
+        self.title = [NSString stringWithFormat:@"total: %lu", (unsigned long)self.homeViewModel.listData.count];
+    }];
     
     [self initUI];
 }
@@ -80,6 +70,41 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - UITableView Delegate and Datasource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.homeViewModel.listData.count;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 50.0f;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    HomeTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"listCellIdentifider"];
+    cell.viewModel = self.homeViewModel.listData[indexPath.row];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        __block NSInteger index = indexPath.row;
+        [self.homeViewModel.removeListDataSignal subscribeNext:^(NSArray *listData) {
+            NSMutableArray *listDataMuArr = [listData mutableCopy];
+            [listDataMuArr removeObjectAtIndex:index];
+            self.homeViewModel.listData = listDataMuArr;
+        }];
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 }
 
 @end

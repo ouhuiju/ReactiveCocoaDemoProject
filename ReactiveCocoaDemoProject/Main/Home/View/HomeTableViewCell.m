@@ -13,12 +13,24 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    [self setupSignal];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
 }
+
+- (void)setupSignal {
+    @weakify(self);
+    [RACObserve(self, viewModel) subscribeNext:^(HomeCellViewModel *viewModel) {
+        @strongify(self);
+        self.textLabel.text = viewModel.title;
+        self.detailTextLabel.text = viewModel.editor;
+        
+//        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:viewModel.imageURL]]];
+    }];
+}
+
 
 @end

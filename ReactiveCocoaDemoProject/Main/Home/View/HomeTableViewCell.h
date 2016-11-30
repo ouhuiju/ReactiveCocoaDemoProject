@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <ReactiveCocoa.h>
+#import "HomeCellViewModel.h"
+
 
 @interface HomeTableViewCell : UITableViewCell
+
+@property (strong, nonatomic) HomeCellViewModel *viewModel;
 
 @end

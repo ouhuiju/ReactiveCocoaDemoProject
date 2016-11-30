@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <ReactiveCocoa.h>
 
+
 @interface BaseViewController : UIViewController
 
 - (void)loadDataWithSignal:(RACSignal *)signal withSuccess:(void (^)())success fail:(void (^)())fail complete:(void (^)())complete;

@@ -19,12 +19,32 @@
     if (self) {
         _sessionManager = [AFHTTPSessionManager manager];
         _sessionManager.requestSerializer.timeoutInterval = 30;
+
+//        [RACObserve(self, listData) subscribeNext:^(id x) {
+//            NSLog(@"%ld", (unsigned long)self.listData.count);
+//        }];
+        
     }
     return self;
 }
 
 - (void)dealloc {
     [self.sessionManager invalidateSessionCancelingTasks:YES];
+}
+
+- (RACSignal *)removeListDataSignal {
+    if (!_removeListDataSignal) {
+        @weakify(self);
+        _removeListDataSignal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            @strongify(self);
+            [subscriber sendNext:self.listData];
+            [subscriber sendCompleted];
+            return [RACDisposable disposableWithBlock:^{
+                
+            }];
+        }];
+    }
+    return _removeListDataSignal;
 }
 
 - (RACCommand *)editCommand {
@@ -50,15 +70,22 @@
             NSURLSessionDataTask *task = [self.sessionManager GET:[URLConfig shareInstance].list parameters:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nonnull responseObject) {
                 NSDictionary *responseDict = responseObject[@"data"];
                 NSArray *listDataArr = responseDict[@"listData"];
-                
                 NSError *error = nil;
-                self.listData = [NSMutableArray arrayWithArray:[MTLJSONAdapter modelsOfClass:[HomeModel class] fromJSONArray:listDataArr error:&error]];
+//                self.listData = [NSMutableArray arrayWithArray:[MTLJSONAdapter modelsOfClass:[HomeModel class] fromJSONArray:listDataArr error:&error]];
+                NSMutableArray *viewModelArr = [NSMutableArray new];
+                for (NSDictionary *data in listDataArr) {
+                    HomeModel *homeModel = [MTLJSONAdapter modelOfClass:[HomeModel class] fromJSONDictionary:data error:&error];
+                    HomeCellViewModel *homeCellViewModel = [[HomeCellViewModel alloc] initWithHomeModel:homeModel];
+                    [viewModelArr addObject:homeCellViewModel];
+                }
+                self.listData = [viewModelArr copy];
                 if (error) {
                     NSLog(@"%@", error);
                 }
                 [subscriber sendNext:self.listData];
                 [subscriber sendCompleted];
             } failure:^(NSURLSessionDataTask * _Nonnull task, NSError * _Nonnull error) {
+                NSLog(@"get list fail, error is %@", error);
                 [subscriber sendNext:self.listData];
                 [subscriber sendError:error];
             }];
@@ -69,44 +96,6 @@
         }];
     }
     return _requestSignal;
-}
-
-#pragma mark - UITableView Delegate and Datasource
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.listData.count;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 50.0f;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    HomeTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"listCellIdentifider"];
-    HomeModel *homeModel = self.listData[indexPath.row];
-    if (!_imageData) {
-        _imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:homeModel.imageURL]];
-    }
-    cell.imageView.image = [UIImage imageWithData:_imageData];
-    cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    cell.textLabel.text = homeModel.title;
-    cell.detailTextLabel.text = homeModel.editor;
-    return cell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSInteger index = indexPath.row;
-        [self.listData removeObjectAtIndex:index];
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
 }
 
 @end
