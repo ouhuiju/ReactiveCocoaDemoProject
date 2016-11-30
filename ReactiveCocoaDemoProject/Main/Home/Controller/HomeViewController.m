@@ -9,10 +9,14 @@
 #import "HomeViewController.h"
 #import "HomeTableViewCell.h"
 #import "HomeTableViewModel.h"
+#import "DetailViewController.h"
+#import "LoginViewController.h"
 
 @interface HomeViewController ()
 
 @property (nonatomic, strong) HomeTableViewModel *homeViewModel;
+
+@property (nonatomic, assign) BOOL shouldPopupLoginView;
 
 @end
 
@@ -20,13 +24,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-        
+    
     _homeViewModel = [[HomeTableViewModel alloc] init];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
-    [self loadDataWithSignal:_homeViewModel.requestSignal withSuccess:^{
+    [self loadDataWithSignal:_homeViewModel.requestSignal withSuccess:^(id x) {
         [self.tableView reloadData];
     } fail:^{
         NSLog(@"load list data error.");
@@ -39,18 +43,71 @@
         self.title = [NSString stringWithFormat:@"total: %lu", (unsigned long)self.homeViewModel.listData.count];
     }];
     
+
     [self initUI];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"]) {
+        _shouldPopupLoginView = ![(NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"] boolValue];
+    }
+    
+    [RACObserve(self, shouldPopupLoginView) subscribeNext:^(id x) {
+        BOOL shouldPopupLoginView = [(NSNumber *)x boolValue];
+        if (shouldPopupLoginView) {
+            
+            LoginViewController *loginViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"loginViewController"];
+            [self.navigationController presentViewController:loginViewController animated:YES completion:^{
+                _shouldPopupLoginView = NO;
+            }];
+        }
+    }];
 }
 
 - (void)initUI {
     [self initEditButton];
+    [self initLogoutButton];
+}
+
+- (void)initLogoutButton {
+    UIBarButtonItem *logoutBarButtonItem = [UIBarButtonItem new];
+    [logoutBarButtonItem setStyle:UIBarButtonItemStyleDone];
+    [logoutBarButtonItem setTitle:@"Logout"];
+    logoutBarButtonItem.rac_command = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            [subscriber sendNext:nil];
+            [subscriber sendCompleted];
+            return [RACDisposable disposableWithBlock:^{
+                
+            }];
+        }];
+    }];
+    
+    [[[logoutBarButtonItem.rac_command executionSignals] switchToLatest] subscribeNext:^(id x) {
+        [[NSUserDefaults standardUserDefaults] setObject:@NO forKey:@"isLogin"];
+        self.shouldPopupLoginView = YES;
+    }];
+    
+    self.navigationItem.leftBarButtonItem = logoutBarButtonItem;
+
 }
 
 - (void)initEditButton {
     UIBarButtonItem *editBarButtonItem = [[UIBarButtonItem alloc] init];
     [editBarButtonItem setStyle:UIBarButtonItemStyleDone];
     [editBarButtonItem setTitle:@"Edit"];
-    editBarButtonItem.rac_command = _homeViewModel.editCommand;
+    
+    editBarButtonItem.rac_command = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            [subscriber sendNext:nil];
+            [subscriber sendCompleted];
+            return [RACDisposable disposableWithBlock:^{
+                
+            }];
+        }];
+    }];
+    
     [[[editBarButtonItem.rac_command executionSignals] switchToLatest] subscribeNext:^(id x) {
         self.tableView.editing = !self.tableView.editing;
     }];
@@ -93,16 +150,27 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    DetailViewController *detailViewController = [[self storyboard] instantiateViewControllerWithIdentifier:@"detailViewController"];
+    detailViewController.detailTitle = ((HomeCellViewModel *)self.homeViewModel.listData[indexPath.row]).title;
+    detailViewController.index = indexPath.row;
+    detailViewController.deleteSubject = [RACSubject subject];
+    [detailViewController.deleteSubject subscribeNext:^(NSNumber *index) {
+        NSMutableArray *listDataMuArr = [self.homeViewModel.listData mutableCopy];
+        [listDataMuArr removeObjectAtIndex:[index integerValue]];
+        [self.tableView reloadData];
+        self.homeViewModel.listData = listDataMuArr;
+    }];
+    [self.navigationController pushViewController:detailViewController animated:YES];
 }
+
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        __block NSInteger index = indexPath.row;
-        [self.homeViewModel.removeListDataSignal subscribeNext:^(NSArray *listData) {
-            NSMutableArray *listDataMuArr = [listData mutableCopy];
-            [listDataMuArr removeObjectAtIndex:index];
-            self.homeViewModel.listData = listDataMuArr;
-        }];
+        NSInteger index = indexPath.row;
+        NSMutableArray *listDataMuArr = [self.homeViewModel.listData mutableCopy];
+        [listDataMuArr removeObjectAtIndex:index];
+        self.homeViewModel.listData = listDataMuArr;
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 }

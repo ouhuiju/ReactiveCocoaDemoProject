@@ -7,6 +7,8 @@
 //
 
 #import "DetailViewController.h"
+#import "DetailModel.h"
+#import "HomeTableViewModel.h"
 
 @interface DetailViewController ()
 
@@ -17,6 +19,34 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    self.title = _detailTitle;
+    
+    _detailViewModel = [[DetailViewModel alloc] initWithDetailTitle:_detailTitle];
+    
+    @weakify(self)
+    [self loadDataWithSignal:_detailViewModel.requestSignal withSuccess:^(id x) {
+        @strongify(self)
+        DetailModel *detailModel = (DetailModel *)x;
+        self.titleLabel.text = detailModel.title;
+        self.contentLabel.text = detailModel.detailContent;
+        self.iconImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:detailModel.imageURL]]];
+    } fail:^{
+        
+    } complete:^{
+        
+    }];
+    
+    UIBarButtonItem *deleteBarButtonItem = [[UIBarButtonItem alloc] init];
+    [deleteBarButtonItem setStyle:UIBarButtonItemStyleDone];
+    [deleteBarButtonItem setTitle:@"delete"];
+    deleteBarButtonItem.rac_command = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+        @strongify(self)
+        [self.navigationController popViewControllerAnimated:YES];
+        [self.deleteSubject sendNext:[NSNumber numberWithInteger:self.index]];
+        return [RACSignal empty];
+    }];
+    self.navigationItem.rightBarButtonItem = deleteBarButtonItem;
 }
 
 - (void)didReceiveMemoryWarning {

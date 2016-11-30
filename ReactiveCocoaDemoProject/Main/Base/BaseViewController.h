@@ -12,6 +12,6 @@
 
 @interface BaseViewController : UIViewController
 
-- (void)loadDataWithSignal:(RACSignal *)signal withSuccess:(void (^)())success fail:(void (^)())fail complete:(void (^)())complete;
+- (void)loadDataWithSignal:(RACSignal *)signal withSuccess:(void (^)(id x))success fail:(void (^)())fail complete:(void (^)())complete;
 
 @end

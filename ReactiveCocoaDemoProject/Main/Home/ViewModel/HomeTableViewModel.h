@@ -18,8 +18,5 @@
 @property (nonatomic, strong) NSArray *listData;
 
 @property (nonatomic, strong) RACSignal *requestSignal;
-@property (nonatomic, strong) RACSignal *removeListDataSignal;
-@property (nonatomic, strong) RACCommand *editCommand;
-@property (nonatomic, strong) NSData *imageData;
 
 @end

@@ -24,11 +24,11 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)loadDataWithSignal:(RACSignal *)signal withSuccess:(void (^)())success fail:(void (^)())fail complete:(void (^)())complete  {
+- (void)loadDataWithSignal:(RACSignal *)signal withSuccess:(void (^)(id x))success fail:(void (^)())fail complete:(void (^)())complete  {
 //    @weakify(self);
     [signal subscribeNext:^(id x) {
 //        @strongify(self);
-        success();
+        success(x);
     } error:^(NSError *error) {
         fail();
     } completed:^{

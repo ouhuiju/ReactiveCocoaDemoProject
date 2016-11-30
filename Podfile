@@ -14,6 +14,7 @@ target 'ReactiveCocoaDemoProject' do
     pod 'FMDB', '2.5'
     pod 'MJExtension', '2.5.14'
     pod 'Mantle'
+    pod 'IQKeyboardManager'
     
   end
 

@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <ReactiveCocoa.h>
+#import "LoginViewModel.h"
 
 @interface LoginViewController : UIViewController
+
+@property (nonatomic, strong) LoginViewModel *loginViewModel;
 
 @end

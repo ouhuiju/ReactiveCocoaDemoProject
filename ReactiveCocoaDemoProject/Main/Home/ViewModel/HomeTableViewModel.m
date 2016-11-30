@@ -19,47 +19,12 @@
     if (self) {
         _sessionManager = [AFHTTPSessionManager manager];
         _sessionManager.requestSerializer.timeoutInterval = 30;
-
-//        [RACObserve(self, listData) subscribeNext:^(id x) {
-//            NSLog(@"%ld", (unsigned long)self.listData.count);
-//        }];
-        
     }
     return self;
 }
 
 - (void)dealloc {
     [self.sessionManager invalidateSessionCancelingTasks:YES];
-}
-
-- (RACSignal *)removeListDataSignal {
-    if (!_removeListDataSignal) {
-        @weakify(self);
-        _removeListDataSignal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            @strongify(self);
-            [subscriber sendNext:self.listData];
-            [subscriber sendCompleted];
-            return [RACDisposable disposableWithBlock:^{
-                
-            }];
-        }];
-    }
-    return _removeListDataSignal;
-}
-
-- (RACCommand *)editCommand {
-    if (!_editCommand) {
-        _editCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
-            return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-                [subscriber sendNext:nil];
-                [subscriber sendCompleted];
-                return [RACDisposable disposableWithBlock:^{
-                    
-                }];
-            }];
-        }];
-    }
-    return _editCommand;
 }
 
 - (RACSignal *)requestSignal {

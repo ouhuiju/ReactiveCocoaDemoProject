@@ -26,6 +26,8 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>146.222.94.140</key>
+			<string></string>
 			<key>ouok-w7.corp.oocl.com</key>
 			<string></string>
 		</dict>
@@ -41,8 +43,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

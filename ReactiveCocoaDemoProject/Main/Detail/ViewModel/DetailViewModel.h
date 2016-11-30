@@ -7,7 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Mantle.h>
+#import <AFNetworking.h>
+#import <ReactiveCocoa.h>
 
 @interface DetailViewModel : NSObject
+
+@property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
+@property (nonatomic, strong) RACSignal *requestSignal;
+
+@property (nonatomic, strong) NSString *detailTitle;
+
+- (instancetype)initWithDetailTitle:(NSString *)detailTitle;
 
 @end
