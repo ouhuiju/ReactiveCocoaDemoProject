@@ -43,8 +43,6 @@
         self.title = [NSString stringWithFormat:@"total: %lu", (unsigned long)self.homeViewModel.listData.count];
     }];
     
-
-    
     [self initUI];
 }
 
@@ -79,18 +77,9 @@
     [logoutBarButtonItem setStyle:UIBarButtonItemStyleDone];
     [logoutBarButtonItem setTitle:@"Logout"];
     logoutBarButtonItem.rac_command = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            [subscriber sendNext:nil];
-            [subscriber sendCompleted];
-            return [RACDisposable disposableWithBlock:^{
-                
-            }];
-        }];
-    }];
-    
-    [[[logoutBarButtonItem.rac_command executionSignals] switchToLatest] subscribeNext:^(id x) {
         [[NSUserDefaults standardUserDefaults] setObject:@NO forKey:@"isLogin"];
         self.shouldPopupLoginView = YES;
+        return [RACSignal empty];
     }];
     
     self.navigationItem.leftBarButtonItem = logoutBarButtonItem;
@@ -103,18 +92,15 @@
     [editBarButtonItem setTitle:@"Edit"];
     
     editBarButtonItem.rac_command = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+        self.tableView.editing = !self.tableView.editing;
+        
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
             [subscriber sendNext:nil];
             [subscriber sendCompleted];
-            return [RACDisposable disposableWithBlock:^{
-                
-            }];
+            return nil;
         }];
     }];
-    
-    [[[editBarButtonItem.rac_command executionSignals] switchToLatest] subscribeNext:^(id x) {
-        self.tableView.editing = !self.tableView.editing;
-    }];
+
     
     RAC(editBarButtonItem, title) = [[editBarButtonItem.rac_command.executionSignals switchToLatest] map:^id(id value) {
         if (self.tableView.editing) {
