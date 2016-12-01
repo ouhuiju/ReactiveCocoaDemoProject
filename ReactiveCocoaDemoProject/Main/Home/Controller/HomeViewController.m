@@ -52,8 +52,6 @@
     [super viewDidAppear:animated];
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"]) {
-        NSNumber *isLoginNum = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"];
-        NSLog(@"%@",isLoginNum);
         _shouldPopupLoginView = ![(NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"] boolValue];
     } else {
         _shouldPopupLoginView = YES;
@@ -164,8 +162,8 @@
     [detailViewController.deleteSubject subscribeNext:^(NSNumber *index) {
         NSMutableArray *listDataMuArr = [self.homeViewModel.listData mutableCopy];
         [listDataMuArr removeObjectAtIndex:[index integerValue]];
-        [self.tableView reloadData];
         self.homeViewModel.listData = listDataMuArr;
+        [self.tableView reloadData];
     }];
     [self.navigationController pushViewController:detailViewController animated:YES];
 }

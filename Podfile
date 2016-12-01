@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '8.0'
+platform :ios, '9.0'
 
 target 'ReactiveCocoaDemoProject' do
   # Uncomment this line if you're using Swift or would like to use dynamic frameworks
@@ -9,7 +9,7 @@ target 'ReactiveCocoaDemoProject' do
 
   target 'ReactiveCocoaDemoProjectTests' do
     inherit! :search_paths
-    pod 'ReactiveCocoa', '2.4.7'
+    pod 'ReactiveCocoa', '2.5'
     pod 'AFNetworking', '2.6.1'
     pod 'FMDB', '2.5'
     pod 'MJExtension', '2.5.14'

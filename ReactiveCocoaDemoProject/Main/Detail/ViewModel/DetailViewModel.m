@@ -53,7 +53,6 @@
                 [subscriber sendCompleted];
             } failure:^(NSURLSessionDataTask * _Nonnull task, NSError * _Nonnull error) {
                 NSLog(@"get detail fail, error is %@", error);
-//                [subscriber sendNext:nil];
                 [subscriber sendError:error];
             }];
             

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <IQKeyboardManager.h>
+#import <IQKeyboardManager/IQKeyboardManager.h>
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
